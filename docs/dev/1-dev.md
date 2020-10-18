@@ -17,3 +17,7 @@ Next: define a resource with:
 $ operator-sdk create api
 
 ```
+
+```bash
+
+```
