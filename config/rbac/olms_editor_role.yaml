@@ -1,0 +1,24 @@
+# permissions for end users to edit olms.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: olms-editor-role
+rules:
+- apiGroups:
+  - olmsg.olms.com
+  resources:
+  - olms
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - olmsg.olms.com
+  resources:
+  - olms/status
+  verbs:
+  - get

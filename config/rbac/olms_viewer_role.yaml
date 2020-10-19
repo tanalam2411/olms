@@ -1,0 +1,20 @@
+# permissions for end users to view olms.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: olms-viewer-role
+rules:
+- apiGroups:
+  - olmsg.olms.com
+  resources:
+  - olms
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - olmsg.olms.com
+  resources:
+  - olms/status
+  verbs:
+  - get

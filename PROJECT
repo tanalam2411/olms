@@ -1,7 +1,7 @@
 domain: olms.com
-layout: go.kubebuilder.io/v2
-projectName: olms
 repo: github.com/tanalam2411/olms
-version: 3-alpha
-plugins:
-  go.sdk.operatorframework.io/v2-alpha: {}
+resources:
+- group: olmsg
+  kind: OLMS
+  version: v1alpha1
+version: "2"
