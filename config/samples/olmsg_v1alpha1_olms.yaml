@@ -4,4 +4,7 @@ metadata:
   name: olms-sample
 spec:
   # Add fields here
-  foo: bar
+  olmNamespace: olm
+  olmReleaseVersion: v1
+
+

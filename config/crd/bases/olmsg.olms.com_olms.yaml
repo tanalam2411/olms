@@ -1,0 +1,71 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.5
+  creationTimestamp: null
+  name: olms.olmsg.olms.com
+spec:
+  group: olmsg.olms.com
+  names:
+    kind: OLMS
+    listKind: OLMSList
+    plural: olms
+    singular: olms
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: OLMS is the Schema for the olms API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: OLMSSpec defines the desired state of OLMS
+          properties:
+            olmNamespace:
+              description: OLMNamespace - Namespace under which olm operator will
+                be installed
+              type: string
+            olmReleaseVersion:
+              description: OLMReleaseVersion - The olm release version to be installed
+              type: string
+          required:
+          - olmNamespace
+          - olmReleaseVersion
+          type: object
+        status:
+          description: OLMSStatus defines the observed state of OLMS
+          properties:
+            olmInstalledVersion:
+              description: Version of OLM installed in the cluster
+              type: string
+            olmIsInstalled:
+              description: Whether OLM is installed in the cluster
+              type: string
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
