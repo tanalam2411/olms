@@ -30,11 +30,7 @@ func GetClientSetUsingInClusterConfig() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-func GetClientSet() (*kubernetes.Clientset, error) {
-	config, err := GetClusterConfig()
-	if err != nil {
-		return nil, err
-	}
+func GetClientSet(config *rest.Config) (*kubernetes.Clientset, error) {
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {

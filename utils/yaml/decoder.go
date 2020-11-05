@@ -5,6 +5,9 @@ import (
 	"github.com/ghodss/yaml"
 	goyaml "github.com/go-yaml/yaml"
 	"io"
+	v14 "k8s.io/api/apps/v1"
+	v12 "k8s.io/api/core/v1"
+	v13 "k8s.io/api/rbac/v1"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
@@ -41,4 +44,54 @@ func YAMLToCRD(crdBytes []byte) (*v1.CustomResourceDefinition, error) {
 		return nil, err
 	}
 	return &crd, nil
+}
+
+func YAMLToNamespace(nsBytes []byte) (*v12.Namespace, error) {
+
+	var ns v12.Namespace
+	err := yaml.Unmarshal(nsBytes, &ns)
+	if err != nil {
+		return nil, err
+	}
+	return &ns, nil
+}
+
+func YAMLToServiceAccount(saBytes []byte) (*v12.ServiceAccount, error) {
+
+	var sa v12.ServiceAccount
+	err := yaml.Unmarshal(saBytes, &sa)
+	if err != nil {
+		return nil, err
+	}
+	return &sa, nil
+}
+
+func YAMLToClusterRole(crBytes []byte) (*v13.ClusterRole, error) {
+
+	var cr v13.ClusterRole
+	err := yaml.Unmarshal(crBytes, &cr)
+	if err != nil {
+		return nil, err
+	}
+	return &cr, nil
+}
+
+func YAMLToClusterRoleBinding(crbBytes []byte) (*v13.ClusterRoleBinding, error) {
+
+	var crb v13.ClusterRoleBinding
+	err := yaml.Unmarshal(crbBytes, &crb)
+	if err != nil {
+		return nil, err
+	}
+	return &crb, nil
+}
+
+func YAMLToDeployment(deployBytes []byte) (*v14.Deployment, error) {
+
+	var deploy v14.Deployment
+	err := yaml.Unmarshal(deployBytes, &deploy)
+	if err != nil {
+		return nil, err
+	}
+	return &deploy, nil
 }

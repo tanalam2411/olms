@@ -24,6 +24,9 @@ import (
 	"github.com/tanalam2411/olms/utils/k8s"
 	"github.com/tanalam2411/olms/utils/rest"
 	"github.com/tanalam2411/olms/utils/yaml"
+	v14 "k8s.io/api/apps/v1"
+	v12 "k8s.io/api/core/v1"
+	v13 "k8s.io/api/rbac/v1"
 	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextension "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -67,14 +70,16 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	log.Info("Found OLMS with configurations", "object:: ", olms)
+
 	config, err := k8s.GetClusterConfig()
 	if err != nil {
 		log.Error(err, "Failed to fetch Cluster Config")
 	}
 
-	kubeClient, err := apiextension.NewForConfig(config)
+	apiExtkubeClient, err := apiextension.NewForConfig(config)
 	if err != nil {
-		log.Error(err, "Failed to create client.")
+		log.Error(err, "Failed to create Api Extension KubeClient.")
 	}
 
 	// Get all CRDs([][]byte) of OLM from OLM's release, create in the cluster
@@ -88,10 +93,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if err != nil {
 			log.Error(err, "Failed to decode from YAMl to CRD")
 		}
-		fmt.Printf("crdObj: %v\n", crdObj)
 
 		// https://www.velotio.com/engineering-blog/extending-kubernetes-apis-with-custom-resource-definitions-crds
-		createdCrd, err := kubeClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdObj, v1.CreateOptions{})
+		createdCrd, err := apiExtkubeClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdObj, v1.CreateOptions{})
 		if err != nil {
 			log.Error(err, "Failed to Create CRD object within the Cluster.")
 		}
@@ -105,7 +109,11 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		log.Error(err, "Failed to fetch OLM's CRDs")
 	}
 
-	fmt.Println("============================================================================")
+	kubeClient, err := k8s.GetClientSet(config)
+	if err != nil {
+		log.Error(err, "Failed to create Cluster ClientSet")
+	}
+
 	for _, resDef := range resDefinitions {
 		sch := runtime.NewScheme()
 		_ = clientgoscheme.AddToScheme(sch)
@@ -117,13 +125,108 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			fmt.Printf("%#v", err)
 		}
 
-		gvk := obj.GetObjectKind()
-		if gvk != nil {
-			fmt.Printf("Object kind: %v \n", gvk)
-		} else {
-			fmt.Println("Object gvk nil : ", gvk)
+		if obj != nil {
+
+			gvk := obj.GetObjectKind()
+			if gvk != nil {
+
+				switch obj.(type) {
+				case *v12.Namespace:
+					nsObj, err := yaml.YAMLToNamespace(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to Namespace")
+					}
+
+					nsClient := kubeClient.CoreV1().Namespaces()
+					ns, err := nsClient.Get(context.TODO(), nsObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get Namespace by name: %v", ns.Name))
+
+						_, err := nsClient.Create(context.TODO(), nsObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create Namespace")
+						}
+						log.Info(fmt.Sprintf("Created Namespace: %T, Value: %v", nsObj, nsObj))
+					}
+
+				case *v12.ServiceAccount:
+					saObj, err := yaml.YAMLToServiceAccount(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to ServiceAccount")
+					}
+
+					saClient := kubeClient.CoreV1().ServiceAccounts(saObj.Namespace)
+					sa, err := saClient.Get(context.TODO(), saObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get ServiceAccount by name: %v", sa.Name))
+
+						_, err := saClient.Create(context.TODO(), saObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create ServiceAccount")
+						}
+						log.Info(fmt.Sprintf("Created ServiceAccount: %T, Value: %v", saObj, saObj))
+					}
+
+				case *v13.ClusterRole:
+					crObj, err := yaml.YAMLToClusterRole(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to ClusterRole")
+					}
+
+					crClient := kubeClient.RbacV1().ClusterRoles()
+					cr, err := crClient.Get(context.TODO(), crObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", cr.Name))
+
+						_, err := crClient.Create(context.TODO(), crObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create ClusterRole")
+						}
+						log.Info(fmt.Sprintf("Created ClusterRole: %T, Value: %v", crObj, crObj))
+					}
+
+				case *v13.ClusterRoleBinding:
+					crbObj, err := yaml.YAMLToClusterRoleBinding(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to ClusterRoleBinding")
+					}
+
+					crbClient := kubeClient.RbacV1().ClusterRoleBindings()
+					crb, err := crbClient.Get(context.TODO(), crbObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crb.Name))
+
+						_, err := crbClient.Create(context.TODO(), crbObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create ClusterRoleBinding")
+						}
+						log.Info(fmt.Sprintf("Created ClusterRoleBinding: %T, Value: %v", crbObj, crbObj))
+					}
+
+				case *v14.Deployment:
+					deployObj, err := yaml.YAMLToDeployment(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to Deployment")
+					}
+
+					deployClient := kubeClient.AppsV1().Deployments(deployObj.Namespace)
+					deploy, err := deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deploy.Name))
+
+						_, err := deployClient.Create(context.TODO(), deployObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create Deployment")
+						}
+						log.Info(fmt.Sprintf("Created Deployment: %T, Value: %v", deployObj, deployObj))
+					}
+
+				}
+
+			}
+
 		}
-		fmt.Println("============================================================================")
+
 	}
 
 	return ctrl.Result{}, nil
