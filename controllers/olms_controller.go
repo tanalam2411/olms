@@ -20,8 +20,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
+	//operatorsv12 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
+	//operatorsv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
 	olmsgv1alpha1 "github.com/tanalam2411/olms/api/v1alpha1"
 	"github.com/tanalam2411/olms/utils/k8s"
+	//utilsOLM "github.com/tanalam2411/olms/utils/olm"
 	"github.com/tanalam2411/olms/utils/rest"
 	"github.com/tanalam2411/olms/utils/yaml"
 	v14 "k8s.io/api/apps/v1"
@@ -112,6 +115,11 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	kubeClient, err := k8s.GetClientSet(config)
 	if err != nil {
 		log.Error(err, "Failed to create Cluster ClientSet")
+	}
+
+	//olmClient, err := utilsOLM.GetOLMClientSet(config)
+	if err != nil {
+		log.Error(err, "Failed to create OLM ClientSet")
 	}
 
 	for _, resDef := range resDefinitions {
@@ -220,6 +228,26 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 						}
 						log.Info(fmt.Sprintf("Created Deployment: %T, Value: %v", deployObj, deployObj))
 					}
+
+				//case olm:
+				//	ogObj, err := yaml.YAMLToOperatorGroup(resDef)
+				//	if err != nil {
+				//		log.Error(err, "Failed to convert YAMl to OperatorGroup")
+				//	}
+				//
+				//
+				//	ogClient := olmClient.OperatorsV1alpha1().CatalogSources()
+				//	deployClient := kubeClient.AppsV1().Deployments(deployObj.Namespace)
+				//	deploy, err := deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
+				//	if err != nil {
+				//		log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deploy.Name))
+				//
+				//		_, err := deployClient.Create(context.TODO(), deployObj, v1.CreateOptions{})
+				//		if err != nil {
+				//			log.Error(err, "Failed to create Deployment")
+				//		}
+				//		log.Info(fmt.Sprintf("Created Deployment: %T, Value: %v", deployObj, deployObj))
+				//	}
 
 				}
 
