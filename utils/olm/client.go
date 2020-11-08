@@ -1,8 +1,8 @@
 package olm
 
 import (
-	"k8s.io/client-go/rest"
 	olmClient "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned"
+	"k8s.io/client-go/rest"
 )
 
 func GetOLMClientSet(config *rest.Config) (*olmClient.Clientset, error) {

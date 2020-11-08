@@ -20,11 +20,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
-	//operatorsv12 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1"
-	//operatorsv1 "github.com/operator-framework/operator-lifecycle-manager/pkg/api/client/clientset/versioned/typed/operators/v1alpha1"
+	v15 "github.com/operator-framework/api/pkg/operators/v1"
 	olmsgv1alpha1 "github.com/tanalam2411/olms/api/v1alpha1"
 	"github.com/tanalam2411/olms/utils/k8s"
-	//utilsOLM "github.com/tanalam2411/olms/utils/olm"
+	"github.com/tanalam2411/olms/utils/olm"
 	"github.com/tanalam2411/olms/utils/rest"
 	"github.com/tanalam2411/olms/utils/yaml"
 	v14 "k8s.io/api/apps/v1"
@@ -52,6 +51,14 @@ type OLMSReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
+}
+
+//type E struct {
+//	str string
+//}
+
+func (e OLMSReconciler) Error() string {
+	return e.str
 }
 
 // +kubebuilder:rbac:groups=olmsg.olms.com,resources=olms,verbs=get;list;watch;create;update;patch;delete
@@ -117,7 +124,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		log.Error(err, "Failed to create Cluster ClientSet")
 	}
 
-	//olmClient, err := utilsOLM.GetOLMClientSet(config)
+	olmClient, err := olm.GetOLMClientSet(config)
 	if err != nil {
 		log.Error(err, "Failed to create OLM ClientSet")
 	}
@@ -146,9 +153,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					}
 
 					nsClient := kubeClient.CoreV1().Namespaces()
-					ns, err := nsClient.Get(context.TODO(), nsObj.Name, v1.GetOptions{})
+					_, err = nsClient.Get(context.TODO(), nsObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get Namespace by name: %v", ns.Name))
+						log.Error(err, fmt.Sprintf("Failed to get Namespace by name: %v", nsObj.Name))
 
 						_, err := nsClient.Create(context.TODO(), nsObj, v1.CreateOptions{})
 						if err != nil {
@@ -164,9 +171,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					}
 
 					saClient := kubeClient.CoreV1().ServiceAccounts(saObj.Namespace)
-					sa, err := saClient.Get(context.TODO(), saObj.Name, v1.GetOptions{})
+					_, err = saClient.Get(context.TODO(), saObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ServiceAccount by name: %v", sa.Name))
+						log.Error(err, fmt.Sprintf("Failed to get ServiceAccount by name: %v", saObj.Name))
 
 						_, err := saClient.Create(context.TODO(), saObj, v1.CreateOptions{})
 						if err != nil {
@@ -182,9 +189,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					}
 
 					crClient := kubeClient.RbacV1().ClusterRoles()
-					cr, err := crClient.Get(context.TODO(), crObj.Name, v1.GetOptions{})
+					_, err = crClient.Get(context.TODO(), crObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", cr.Name))
+						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crObj.Name))
 
 						_, err := crClient.Create(context.TODO(), crObj, v1.CreateOptions{})
 						if err != nil {
@@ -200,9 +207,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					}
 
 					crbClient := kubeClient.RbacV1().ClusterRoleBindings()
-					crb, err := crbClient.Get(context.TODO(), crbObj.Name, v1.GetOptions{})
+					_, err = crbClient.Get(context.TODO(), crbObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crb.Name))
+						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crbObj.Name))
 
 						_, err := crbClient.Create(context.TODO(), crbObj, v1.CreateOptions{})
 						if err != nil {
@@ -218,9 +225,9 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					}
 
 					deployClient := kubeClient.AppsV1().Deployments(deployObj.Namespace)
-					deploy, err := deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
+					_, err = deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deploy.Name))
+						log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deployObj.Name))
 
 						_, err := deployClient.Create(context.TODO(), deployObj, v1.CreateOptions{})
 						if err != nil {
@@ -229,25 +236,23 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 						log.Info(fmt.Sprintf("Created Deployment: %T, Value: %v", deployObj, deployObj))
 					}
 
-				//case olm:
-				//	ogObj, err := yaml.YAMLToOperatorGroup(resDef)
-				//	if err != nil {
-				//		log.Error(err, "Failed to convert YAMl to OperatorGroup")
-				//	}
-				//
-				//
-				//	ogClient := olmClient.OperatorsV1alpha1().CatalogSources()
-				//	deployClient := kubeClient.AppsV1().Deployments(deployObj.Namespace)
-				//	deploy, err := deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
-				//	if err != nil {
-				//		log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deploy.Name))
-				//
-				//		_, err := deployClient.Create(context.TODO(), deployObj, v1.CreateOptions{})
-				//		if err != nil {
-				//			log.Error(err, "Failed to create Deployment")
-				//		}
-				//		log.Info(fmt.Sprintf("Created Deployment: %T, Value: %v", deployObj, deployObj))
-				//	}
+				case *v15.OperatorGroup:
+					ogObj, err := yaml.YAMLToOperatorGroup(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to OperatorGroup")
+					}
+
+					ogClient := olmClient.OperatorsV1().OperatorGroups(ogObj.Namespace)
+					_, err = ogClient.Get(context.TODO(), ogObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get OperatorGroup by name: %v", ogObj.Name))
+
+						_, err := ogClient.Create(context.TODO(), ogObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create OperatorGroup")
+						}
+						log.Info(fmt.Sprintf("Created OperatorGroup: %T, Value: %v", ogObj, ogObj))
+					}
 
 				}
 
