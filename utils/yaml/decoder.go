@@ -5,6 +5,7 @@ import (
 	"github.com/ghodss/yaml"
 	goyaml "github.com/go-yaml/yaml"
 	v15 "github.com/operator-framework/api/pkg/operators/v1"
+	"github.com/operator-framework/api/pkg/operators/v1alpha1"
 	"io"
 	v14 "k8s.io/api/apps/v1"
 	v12 "k8s.io/api/core/v1"
@@ -105,4 +106,24 @@ func YAMLToOperatorGroup(ogBytes []byte) (*v15.OperatorGroup, error) {
 		return nil, err
 	}
 	return &og, nil
+}
+
+func YAMLToClusterServiceVersion(csvBytes []byte) (*v1alpha1.ClusterServiceVersion, error) {
+
+	var csv v1alpha1.ClusterServiceVersion
+	err := yaml.Unmarshal(csvBytes, &csv)
+	if err != nil {
+		return nil, err
+	}
+	return &csv, nil
+}
+
+func YAMLToCatalogSource(csBytes []byte) (*v1alpha1.CatalogSource, error) {
+
+	var cs v1alpha1.CatalogSource
+	err := yaml.Unmarshal(csBytes, &cs)
+	if err != nil {
+		return nil, err
+	}
+	return &cs, nil
 }

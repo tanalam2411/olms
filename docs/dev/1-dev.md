@@ -32,10 +32,69 @@ go vet ./...
 go build -o bin/manager main.go
 ```
 
+---
+
+##### Verify all olm resources 
+
+1. Namespace - `olm`, `operators`
 ```bash
-go get -u .
+$ k get ns | grep -E 'olm|operators'
+olm                  Active   2m55s
+operators            Active   2m55s
 ```
 
+2. Service Account - `olm-operator-serviceaccount`
 ```bash
+$ k get sa -n olm
+NAME                          SECRETS   AGE
+default                       1         3m51s
+olm-operator-serviceaccount   1         3m51s
+```
 
+3. ClusterRole - `system:controller:operator-lifecycle-manager`, `aggregate-olm-edit`, `aggregate-olm-view`
+```bash
+$ k get clusterrole | grep -E 'aggregate-olm|lifecycle'
+aggregate-olm-edit                                                     2020-11-14T19:55:19Z
+aggregate-olm-view                                                     2020-11-14T19:55:19Z
+system:controller:operator-lifecycle-manager                           2020-11-14T19:55:19Z
+``` 
+
+4. ClusterRoleBinding - `olm-operator-binding-olm`
+```bash
+$ k get clusterrolebindings | grep 'olm'
+olm-operator-binding-olm                               ClusterRole/system:controller:operator-lifecycle-manager                           11m
+```
+
+5. Deployment - `olm-operator`, `catalog-operator`
+```bash
+$ k get deploy -n olm
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+catalog-operator   1/1     1            1           12m
+olm-operator       1/1     1            1           12m
+packageserver      2/2     2            2           12m
+```
+
+6. OperatorGroup - `global-opertors`, `olm-operators`
+```bash
+$ k get og -n operators
+NAME               AGE
+global-operators   15m
+
+$ k get og -n olm
+NAME            AGE
+olm-operators   15m
+```
+
+7. ClusterServiceVersion - `packageserver`
+```bash
+$ k get csv -n olm
+NAME            DISPLAY          VERSION   REPLACES   PHASE
+packageserver   Package Server   0.16.1               Succeeded
+```
+
+8. CatalogSource - `operatorhubio-catalog`
+```bash
+$ k get catsrc -n olm
+NAME                    DISPLAY               TYPE   PUBLISHER        AGE
+operatorhubio-catalog   Community Operators   grpc   OperatorHub.io   20m
 ```

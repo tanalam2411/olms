@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/go-logr/logr"
 	v15 "github.com/operator-framework/api/pkg/operators/v1"
+	"github.com/operator-framework/api/pkg/operators/v1alpha1"
 	olmsgv1alpha1 "github.com/tanalam2411/olms/api/v1alpha1"
 	"github.com/tanalam2411/olms/utils/k8s"
 	"github.com/tanalam2411/olms/utils/olm"
@@ -127,6 +128,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		_ = clientgoscheme.AddToScheme(sch)
 		_ = apiextv1beta1.AddToScheme(sch)
 		_ = v15.AddToScheme(sch)
+		_ = v1alpha1.AddToScheme(sch)
 
 		decode := serializer.NewCodecFactory(sch).UniversalDeserializer().Decode
 		obj, _, err := decode([]byte(resDef), nil, nil)
@@ -247,6 +249,43 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 						}
 						log.Info(fmt.Sprintf("Created OperatorGroup: %T, Value: %v", ogObj, ogObj))
 					}
+
+				case *v1alpha1.ClusterServiceVersion:
+					csvObj, err := yaml.YAMLToClusterServiceVersion(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to ClusterServiceVersion")
+					}
+
+					csvClient := olmClient.OperatorsV1alpha1().ClusterServiceVersions(csvObj.Namespace)
+					_, err = csvClient.Get(context.TODO(), csvObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get ClusterServiceVersion by name: %v", csvObj.Name))
+
+						_, err := csvClient.Create(context.TODO(), csvObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create ClusterServiceVersion")
+						}
+						log.Info(fmt.Sprintf("Created ClusterServiceVersion: %T, Value: %v", csvObj, csvObj))
+					}
+
+				case *v1alpha1.CatalogSource:
+					csObj, err := yaml.YAMLToCatalogSource(resDef)
+					if err != nil {
+						log.Error(err, "Failed to convert YAMl to CatalogSource")
+					}
+
+					csClient := olmClient.OperatorsV1alpha1().CatalogSources(csObj.Namespace)
+					_, err = csClient.Get(context.TODO(), csObj.Name, v1.GetOptions{})
+					if err != nil {
+						log.Error(err, fmt.Sprintf("Failed to get CatalogSource by name: %v", csObj.Name))
+
+						_, err := csClient.Create(context.TODO(), csObj, v1.CreateOptions{})
+						if err != nil {
+							log.Error(err, "Failed to create CatalogSource")
+						}
+						log.Info(fmt.Sprintf("Created CatalogSource: %T, Value: %v", csObj, csObj))
+					}
+
 				}
 
 			}
