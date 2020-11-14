@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/ghodss/yaml"
 	goyaml "github.com/go-yaml/yaml"
+	v15 "github.com/operator-framework/api/pkg/operators/v1"
 	"io"
 	v14 "k8s.io/api/apps/v1"
 	v12 "k8s.io/api/core/v1"
@@ -94,4 +95,14 @@ func YAMLToDeployment(deployBytes []byte) (*v14.Deployment, error) {
 		return nil, err
 	}
 	return &deploy, nil
+}
+
+func YAMLToOperatorGroup(ogBytes []byte) (*v15.OperatorGroup, error) {
+
+	var og v15.OperatorGroup
+	err := yaml.Unmarshal(ogBytes, &og)
+	if err != nil {
+		return nil, err
+	}
+	return &og, nil
 }
