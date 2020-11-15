@@ -98,3 +98,10 @@ $ k get catsrc -n olm
 NAME                    DISPLAY               TYPE   PUBLISHER        AGE
 operatorhubio-catalog   Community Operators   grpc   OperatorHub.io   20m
 ```
+
+9. Kafka 
+```bash
+$ k get packagemanifests | grep -i kafka
+banzaicloud-kafka-operator                 Community Operators   24h
+strimzi-kafka-operator                     Community Operators   24h
+```
