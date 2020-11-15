@@ -1,6 +1,9 @@
 # olms
 Operator Lifecycle Manager Supervisor
 
+![olms architecture diagram](./docs/static/olms_architecture_diagram.png)
+
+
 ##### Install Operator Lifecycle Manager with Custom Operator Catalog for Kubernetes
 
 - [OLM](https://github.com/operator-framework/operator-lifecycle-manager) extends Kubernetes to provide a declarative way to install, manage and upgrade Operators and their dependencies in a cluster.
