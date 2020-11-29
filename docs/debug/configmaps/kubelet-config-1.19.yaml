@@ -1,0 +1,60 @@
+apiVersion: v1
+data:
+  kubelet: |
+    apiVersion: kubelet.config.k8s.io/v1beta1
+    authentication:
+      anonymous:
+        enabled: false
+      webhook:
+        cacheTTL: 0s
+        enabled: true
+      x509:
+        clientCAFile: /etc/kubernetes/pki/ca.crt
+    authorization:
+      mode: Webhook
+      webhook:
+        cacheAuthorizedTTL: 0s
+        cacheUnauthorizedTTL: 0s
+    clusterDNS:
+    - 10.96.0.10
+    clusterDomain: cluster.local
+    cpuManagerReconcilePeriod: 0s
+    evictionHard:
+      imagefs.available: 0%
+      nodefs.available: 0%
+      nodefs.inodesFree: 0%
+    evictionPressureTransitionPeriod: 0s
+    fileCheckFrequency: 0s
+    healthzBindAddress: 127.0.0.1
+    healthzPort: 10248
+    httpCheckFrequency: 0s
+    imageGCHighThresholdPercent: 100
+    imageMinimumGCAge: 0s
+    kind: KubeletConfiguration
+    logging: {}
+    nodeStatusReportFrequency: 0s
+    nodeStatusUpdateFrequency: 0s
+    rotateCertificates: true
+    runtimeRequestTimeout: 0s
+    staticPodPath: /etc/kubernetes/manifests
+    streamingConnectionIdleTimeout: 0s
+    syncFrequency: 0s
+    volumeStatsAggPeriod: 0s
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2020-11-26T05:49:07Z"
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:data:
+        .: {}
+        f:kubelet: {}
+    manager: kubeadm
+    operation: Update
+    time: "2020-11-26T05:49:07Z"
+  name: kubelet-config-1.19
+  namespace: kube-system
+  resourceVersion: "170"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/kubelet-config-1.19
+  uid: 849ebce6-2328-4a88-9228-214b89080f6d

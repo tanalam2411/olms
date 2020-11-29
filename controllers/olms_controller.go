@@ -75,7 +75,8 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log.Info("Found OLMS with configurations", "object:: ", olms)
 
-	config, err := k8s.GetClusterConfig()
+	//config, err := k8s.GetClusterConfig()
+	config, err := k8s.GetInClusterConfig()
 	if err != nil {
 		log.Error(err, "Failed to fetch Cluster Config")
 	}
