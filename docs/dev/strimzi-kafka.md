@@ -1,6 +1,7 @@
 ##### Installing Strimzi kafka operator
 
 1. Install OLM
+
 ```bash
 $ kubectl apply -f https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.17.0/crds.yaml
 
@@ -31,6 +32,7 @@ catalogsource.operators.coreos.com/operatorhubio-catalog created
 
 
 2. Installing strimzi operator
+
 ```bash
 $ kubectl create -f https://operatorhub.io/install/strimzi-kafka-operator.yaml
 subscription.operators.coreos.com/my-strimzi-kafka-operator created
@@ -41,7 +43,7 @@ NAME                               DISPLAY   VERSION   REPLACES                 
 strimzi-cluster-operator.v0.20.1   Strimzi   0.20.1    strimzi-cluster-operator.v0.20.0   Pending
 ```
 ```bash
-$ k get all -n operators
+$ kubectl get all -n operators
 NAME                                                   READY   STATUS              RESTARTS   AGE
 pod/strimzi-cluster-operator-v0.20.1-5dc7cb547-d8nqr   0/1     ContainerCreating   0          61s
 
@@ -57,7 +59,7 @@ NAME                               DISPLAY   VERSION   REPLACES                 
 strimzi-cluster-operator.v0.20.1   Strimzi   0.20.1    strimzi-cluster-operator.v0.20.0   Succeeded
 ```
 ```bash
-$ k get ns
+$ kubectl get ns
 NAME                 STATUS   AGE
 default              Active   8h
 kube-node-lease      Active   8h
@@ -69,6 +71,7 @@ operators            Active   2m1s
 ```
 
 3. Installing kafka - https://operatorhub.io/operator/strimzi-kafka-operator - Custom Resource Definitions
+
 ```yaml
 apiVersion: kafka.strimzi.io/v1beta1
 kind: Kafka
@@ -105,12 +108,12 @@ spec:
 ```
 
 ```bash
-$ k create -f kafka.yaml 
+$ kubectl create -f kafka.yaml 
 kafka.kafka.strimzi.io/my-cluster created
 ```
 
 ```bash
-$ k get all
+$ kubectl get all
 NAME                                              READY   STATUS    RESTARTS   AGE
 pod/my-cluster-entity-operator-6b7f77b756-2m2wn   3/3     Running   0          71s
 pod/my-cluster-kafka-0                            1/1     Running   0          100s
