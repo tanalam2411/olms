@@ -103,7 +103,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if err != nil {
 			log.Error(err, "Failed to Create CRD object within the Cluster.")
 		} else {
-			fmt.Printf("CRD got created: %v \n", createdCrd)
+			fmt.Printf("CRD got created: %v \n", createdCrd.Name)
 		}
 
 	}
@@ -152,7 +152,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					nsClient := kubeClient.CoreV1().Namespaces()
 					_, err = nsClient.Get(context.TODO(), nsObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get Namespace by name: %v", nsObj.Name))
+						log.Info(fmt.Sprintf("Failed to get Namespace by name: %v", nsObj.Name))
 
 						_, err := nsClient.Create(context.TODO(), nsObj, v1.CreateOptions{})
 						if err != nil {
@@ -170,7 +170,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					saClient := kubeClient.CoreV1().ServiceAccounts(saObj.Namespace)
 					_, err = saClient.Get(context.TODO(), saObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ServiceAccount by name: %v", saObj.Name))
+						log.Info(fmt.Sprintf("Failed to get ServiceAccount by name: %v", saObj.Name))
 
 						_, err := saClient.Create(context.TODO(), saObj, v1.CreateOptions{})
 						if err != nil {
@@ -188,7 +188,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					crClient := kubeClient.RbacV1().ClusterRoles()
 					_, err = crClient.Get(context.TODO(), crObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crObj.Name))
+						log.Info(fmt.Sprintf("Failed to get ClusterRole by name: %v", crObj.Name))
 
 						_, err := crClient.Create(context.TODO(), crObj, v1.CreateOptions{})
 						if err != nil {
@@ -206,7 +206,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					crbClient := kubeClient.RbacV1().ClusterRoleBindings()
 					_, err = crbClient.Get(context.TODO(), crbObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ClusterRole by name: %v", crbObj.Name))
+						log.Info(fmt.Sprintf("Failed to get ClusterRole by name: %v", crbObj.Name))
 
 						_, err := crbClient.Create(context.TODO(), crbObj, v1.CreateOptions{})
 						if err != nil {
@@ -224,7 +224,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					deployClient := kubeClient.AppsV1().Deployments(deployObj.Namespace)
 					_, err = deployClient.Get(context.TODO(), deployObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get Deployment by name: %v", deployObj.Name))
+						log.Info(fmt.Sprintf("Failed to get Deployment by name: %v", deployObj.Name))
 
 						_, err := deployClient.Create(context.TODO(), deployObj, v1.CreateOptions{})
 						if err != nil {
@@ -242,7 +242,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					ogClient := olmClient.OperatorsV1().OperatorGroups(ogObj.Namespace)
 					_, err = ogClient.Get(context.TODO(), ogObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get OperatorGroup by name: %v", ogObj.Name))
+						log.Info(fmt.Sprintf("Failed to get OperatorGroup by name: %v", ogObj.Name))
 
 						_, err := ogClient.Create(context.TODO(), ogObj, v1.CreateOptions{})
 						if err != nil {
@@ -260,7 +260,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					csvClient := olmClient.OperatorsV1alpha1().ClusterServiceVersions(csvObj.Namespace)
 					_, err = csvClient.Get(context.TODO(), csvObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get ClusterServiceVersion by name: %v", csvObj.Name))
+						log.Info(fmt.Sprintf("Failed to get ClusterServiceVersion by name: %v", csvObj.Name))
 
 						_, err := csvClient.Create(context.TODO(), csvObj, v1.CreateOptions{})
 						if err != nil {
@@ -278,7 +278,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					csClient := olmClient.OperatorsV1alpha1().CatalogSources(csObj.Namespace)
 					_, err = csClient.Get(context.TODO(), csObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Error(err, fmt.Sprintf("Failed to get CatalogSource by name: %v", csObj.Name))
+						log.Info(fmt.Sprintf("Failed to get CatalogSource by name: %v", csObj.Name))
 
 						_, err := csClient.Create(context.TODO(), csObj, v1.CreateOptions{})
 						if err != nil {
