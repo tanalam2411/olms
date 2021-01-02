@@ -206,7 +206,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 					crbClient := kubeClient.RbacV1().ClusterRoleBindings()
 					_, err = crbClient.Get(context.TODO(), crbObj.Name, v1.GetOptions{})
 					if err != nil {
-						log.Info(fmt.Sprintf("Failed to get ClusterRole by name: %v", crbObj.Name))
+						log.Info(fmt.Sprintf("Failed to get ClusterRoleBinding by name: %v", crbObj.Name))
 
 						_, err := crbClient.Create(context.TODO(), crbObj, v1.CreateOptions{})
 						if err != nil {
