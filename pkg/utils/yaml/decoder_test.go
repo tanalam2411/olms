@@ -1,7 +1,7 @@
 package yaml
 
 import (
-	"github.com/tanalam2411/olms/utils/rest"
+	"github.com/tanalam2411/olms/pkg/utils/rest"
 	"testing"
 )
 

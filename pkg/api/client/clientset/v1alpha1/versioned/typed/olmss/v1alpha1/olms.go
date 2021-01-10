@@ -2,7 +2,7 @@ package v1alpha1
 
 import (
 	"context"
-	"github.com/tanalam2411/olms/api/v1alpha1"
+	"github.com/tanalam2411/olms/pkg/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"

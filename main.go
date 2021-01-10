@@ -27,8 +27,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	olmsgv1alpha1 "github.com/tanalam2411/olms/api/v1alpha1"
-	"github.com/tanalam2411/olms/controllers"
+	olmsgv1alpha1 "github.com/tanalam2411/olms/pkg/api/v1alpha1"
+	"github.com/tanalam2411/olms/pkg/controllers"
 	// +kubebuilder:scaffold:imports
 )
 
