@@ -59,7 +59,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.olmssV1alpha1 = olmssv1alpha1.New(c)
-	
+
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs
 }
