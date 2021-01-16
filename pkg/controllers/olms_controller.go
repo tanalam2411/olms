@@ -22,7 +22,7 @@ import (
 	"github.com/go-logr/logr"
 	v15 "github.com/operator-framework/api/pkg/operators/v1"
 	"github.com/operator-framework/api/pkg/operators/v1alpha1"
-	olmsgv1alpha1 "github.com/tanalam2411/olms/pkg/api/v1alpha1"
+	olmsgv1alpha1 "github.com/tanalam2411/olms/pkg/api/olms/v1alpha1"
 	"github.com/tanalam2411/olms/pkg/utils/k8s"
 	"github.com/tanalam2411/olms/pkg/utils/olm"
 	"github.com/tanalam2411/olms/pkg/utils/rest"
@@ -75,8 +75,8 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log.Info("Found OLMS with configurations", "object:: ", olms)
 
-	//config, err := k8s.GetClusterConfig()
-	config, err := k8s.GetInClusterConfig()
+	config, err := k8s.GetClusterConfig()
+	//config, err := k8s.GetInClusterConfig()
 	if err != nil {
 		log.Error(err, "Failed to fetch Cluster Config")
 	}

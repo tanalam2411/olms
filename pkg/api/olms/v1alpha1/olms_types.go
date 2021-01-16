@@ -123,6 +123,8 @@ type OLMSStatus struct {
 	OLMInstalledVersion string `json:"olmInstalledVersion,omitempty"`
 }
 
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
