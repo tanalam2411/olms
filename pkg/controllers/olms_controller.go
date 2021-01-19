@@ -23,6 +23,7 @@ import (
 	v15 "github.com/operator-framework/api/pkg/operators/v1"
 	"github.com/operator-framework/api/pkg/operators/v1alpha1"
 	olmsgv1alpha1 "github.com/tanalam2411/olms/pkg/api/olms/v1alpha1"
+	"github.com/tanalam2411/olms/pkg/utils/file"
 	"github.com/tanalam2411/olms/pkg/utils/k8s"
 	"github.com/tanalam2411/olms/pkg/utils/olm"
 	"github.com/tanalam2411/olms/pkg/utils/rest"
@@ -75,8 +76,8 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	log.Info("Found OLMS with configurations", "object:: ", olms)
 
-	config, err := k8s.GetClusterConfig()
-	//config, err := k8s.GetInClusterConfig()
+	//config, err := k8s.GetClusterConfig()
+	config, err := k8s.GetInClusterConfig()
 	if err != nil {
 		log.Error(err, "Failed to fetch Cluster Config")
 	}
@@ -87,7 +88,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Get all CRDs([][]byte) of OLM from OLM's release, create in the cluster
-	crds, err := GetOLMCrds()
+	crds, err := GetOLMCrds("v0.16.1", true)
 	if err != nil {
 		log.Error(err, "Failed to fetch OLM's CRDs")
 	}
@@ -109,7 +110,7 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Get all the OLM Resources([][]byte) from OLM's release, create in the cluster
-	resDefinitions, err := GetOLMResourcesDefinitions()
+	resDefinitions, err := GetOLMResourcesDefinitions("v0.16.1", true)
 	if err != nil {
 		log.Error(err, "Failed to fetch OLM's CRDs")
 	}
@@ -298,11 +299,20 @@ func (r *OLMSReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func GetOLMCrds() ([][]byte, error) {
-	olmCRDs, err := rest.HttpGET(olmCRDUrl)
+func GetOLMCrds(olmVersion string, offline bool) ([][]byte, error) {
+	var olmCRDs []byte
+	var err error
 
-	if err != nil {
-		return nil, err
+	if offline == true {
+		olmCRDs, err = file.ReadFile(fmt.Sprintf("./manifests/olm/%s/crds.yaml", olmVersion))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		olmCRDs, err = rest.HttpGET(olmCRDUrl)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	crds, err := yaml.SplitYAML(olmCRDs)
@@ -313,11 +323,20 @@ func GetOLMCrds() ([][]byte, error) {
 	return crds, nil
 }
 
-func GetOLMResourcesDefinitions() ([][]byte, error) {
-	olmResDefinitions, err := rest.HttpGET(olmResourcesDefinitionUrl)
+func GetOLMResourcesDefinitions(olmVersion string, offline bool) ([][]byte, error) {
+	var olmResDefinitions []byte
+	var err error
 
-	if err != nil {
-		return nil, err
+	if offline == true {
+		olmResDefinitions, err = file.ReadFile(fmt.Sprintf("./manifests/olm/%s/olm.yaml", olmVersion))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		olmResDefinitions, err = rest.HttpGET(olmCRDUrl)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resDefinitions, err := yaml.SplitYAML(olmResDefinitions)

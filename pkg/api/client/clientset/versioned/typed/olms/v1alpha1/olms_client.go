@@ -18,8 +18,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/tanalam2411/olms/pkg/api/olms/v1alpha1"
 	"github.com/tanalam2411/olms/pkg/api/client/clientset/versioned/scheme"
+	v1alpha1 "github.com/tanalam2411/olms/pkg/api/olms/v1alpha1"
 	rest "k8s.io/client-go/rest"
 )
 
